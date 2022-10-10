@@ -1,0 +1,91 @@
+{
+	"CONFIG": {
+		"comment": "Config is a place where we store language settings",
+
+		"name": "Calculator",
+		"main": "P_SIMPLE_OR_SCOPE",
+		"version": "0.1",
+		"prepend_with": "(",
+		"append_with": ")"
+	},
+	"SYNTHAX": {
+		"comment": "Synthax contains PHRASES/WORDS/SYLLABLES/LETTERS",
+
+		"PHRASES": {
+			"comment": "Phrases consist of and/or sequences of phrases/words",
+
+			"P_SIMPLE_OR_SCOPE": {
+				"or": ["P_SCOPE", "P_SIMPLE"],
+				"space": true
+			},
+			"P_SIMPLE": {
+				"and": ["P_OPERAND_PHRASE", "W_OPERATOR", "P_OPERAND_PHRASE"],
+				"space": true
+			},
+			"P_OPERAND_PHRASE": {
+				"or": ["P_OPERAND", "P_SCOPE", "P_SIMPLE"],
+				"space": true
+			},
+			"P_OPERAND": {
+				"or": ["W_FLOAT", "W_INT"],
+				"space": true
+			},
+			"P_SCOPE": {
+				"and": ["W_SCOPE_OPEN", "P_SIMPLE", "W_SCOPE_CLOSE"],
+				"space": true
+			}
+		},
+		"WORDS": {
+			"comment": "Words are collected by lexor, consist of syllables",
+
+			"W_OPERATOR":{
+				"syllables": ["S_OPERATOR"]
+			},
+			"W_FLOAT": {
+				"syllables": ["S_DIGITS", "S_DOT", "S_DIGITS"]
+			},
+			"W_INT": {
+				"syllables": ["S_DIGITS"]
+			},
+			"W_SCOPE_OPEN": {
+				"syllables": ["S_SCOPE_OPEN"]
+			},
+			"W_SCOPE_CLOSE": {
+				"syllables": ["S_SCOPE_CLOSE"]
+			}
+		},
+		"SYLLABLES": {
+			"comment": "Syllables are sequences of letters within max length",
+
+			"S_DOT": {
+				"letters": "L_DOT",
+				"max": 1
+			},
+			"S_OPERATOR": {
+				"letters": "L_OPERATOR",
+				"max": 1
+			},
+			"S_DIGITS": {
+				"letters": "L_DIGIT",
+				"max": 5
+			},
+			"S_SCOPE_OPEN": {
+				"letters": "L_SCOPE_OPEN",
+				"max": 1
+			},
+			"S_SCOPE_CLOSE": {
+				"letters": "L_SCOPE_CLOSE",
+				"max": 1
+			}
+		},
+		"LETTERS": {
+			"comment": "Letters are sets of characters",
+
+			"L_DIGIT": "0123456789",
+			"L_OPERATOR": "*/+*",
+			"L_DOT": ".",
+			"L_SCOPE_OPEN": "(",
+			"L_SCOPE_CLOSE": ")"
+		}
+	}
+}

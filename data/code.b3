@@ -1,0 +1,2 @@
+(fox is animal)
+(dog is (fox is ?))

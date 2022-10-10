@@ -1,0 +1,92 @@
+{
+	"CONFIG": {
+		"name": "B3",
+		"main": "P_LIST",
+		"version": "0.1",
+		"prepend_with": "",
+		"append_with": ""
+	},
+	"SYNTHAX": {
+		"PHRASES": {
+			"P_LIST": {
+				"or+": ["P_EXPRESSION_OR_SCOPE", "P_LIST"]
+			},
+			"P_EXPRESSION_OR_SCOPE": {
+				"or": ["P_SCOPE", "P_EXPRESSION"]
+			},
+			"P_SCOPE": {
+				"and": ["W_SCOPE_OPEN", "P_EXPRESSION", "W_SCOPE_CLOSE"]
+			},
+			"P_EXPRESSION": {
+				"or": ["P_TRT", "P_Q_1", "P_Q_2", "P_Q_3", "P_Q_12", "P_Q_23"]
+			},
+
+			"P_TRT": {
+				"and": ["P_THING_OR_SCOPE", "P_THING_OR_SCOPE", "P_THING_OR_SCOPE"]
+			},
+			"P_Q_1": {
+				"and": ["W_QUESTION", "P_THING_OR_SCOPE", "P_THING_OR_SCOPE"]
+			},
+			"P_Q_2": {
+				"and": ["P_THING_OR_SCOPE", "W_QUESTION", "P_THING_OR_SCOPE"]
+			},
+			"P_Q_3": {
+				"and": ["P_THING_OR_SCOPE", "P_THING_OR_SCOPE", "W_QUESTION"]
+			},
+			"P_Q_12": {
+				"and": ["W_QUESTION", "W_QUESTION", "P_THING_OR_SCOPE"]
+			},
+			"P_Q_23": {
+				"and": ["P_THING_OR_SCOPE", "W_QUESTION", "W_QUESTION"]
+			},
+
+			"P_THING_OR_SCOPE": {
+				"or": ["W_THING", "P_SCOPE"]
+			},
+			"P_THING": {
+				"or": ["P_SCOPE", "W_THING", "W_QUESTION"]
+			}
+		},
+		"WORDS": {
+			"W_THING":{
+				"syllables": ["S_VALUE"]
+			},
+			"W_RELATION":{
+				"syllables": ["S_VALUE"]
+			},
+			"W_QUESTION": {
+				"syllables": ["S_QUESTION"]
+			},
+			"W_SCOPE_OPEN": {
+				"syllables": ["S_SCOPE_OPEN"]
+			},
+			"W_SCOPE_CLOSE": {
+				"syllables": ["S_SCOPE_CLOSE"]
+			}
+		},
+		"SYLLABLES": {
+			"S_QUESTION": {
+				"letters": "L_QUESTION",
+				"max": 1
+			},
+			"S_VALUE": {
+				"letters": "L_ALPHANUMERIC",
+				"max": 255
+			},
+			"S_SCOPE_OPEN": {
+				"letters": "L_SCOPE_OPEN",
+				"max": 1
+			},
+			"S_SCOPE_CLOSE": {
+				"letters": "L_SCOPE_CLOSE",
+				"max": 1
+			}
+		},
+		"LETTERS": {
+			"L_QUESTION": "?",
+			"L_ALPHANUMERIC": "01234567abcdefghigklmnopqrstuvwxyz",
+			"L_SCOPE_OPEN": "(",
+			"L_SCOPE_CLOSE": ")"
+		}
+	}
+}
