@@ -1,2 +1,3 @@
 (fox is animal)
-(dog is (fox is ?))
+(fish is animal)
+(dog is (fox & ?))

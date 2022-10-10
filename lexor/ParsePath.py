@@ -1,20 +1,34 @@
 from functools import wraps
 import types
 
+from lexor.CycleDetector import CycleDetector
+from lexor.Exceptions import (
+    CyclicRecursionException,
+    UnexpectedTokenException
+)
+
 class ParsePath:
     instance = None
     def __init__(self):
         self.path = []
+        self.lexor = None
         self.is_augmented = False
+        self.cycle_detector = CycleDetector()
+        self.max_n = 0
 
     def push(self, name):
+        detected = self.cycle_detector.detect(self.path, name)
         self.path.append(name)
+        if detected:
+            raise UnexpectedTokenException(self.path, [], self.lexor.s[self.max_n])
+            # raise CyclicRecursionException(self.path)
 
     def pop(self):
         self.path.pop()
 
     def augment(self, lexor):
         if not self.is_augmented:
+            self.lexor = lexor
             parse_path = self
             def lexor_log(self, *args):
                 level = len(parse_path.path)
@@ -38,7 +52,7 @@ class ParsePath:
         @wraps(f)
         def wrapper(self, name, *args):
             path.augment(self)
-            path.push(name)
+            path.push(f'{name} {self.n}')
             return_value = f(self, name, *args)
             path.pop()
             return return_value
@@ -50,14 +64,15 @@ class ParsePath:
         @wraps(f)
         def wrapper(self, name, *args):
             mark = self.n
-            # print(f'\t\tbefore {name}', self.n)
             return_value = f(self, name, *args)
-            # print(f'\t\tafter {name}', self.n)
             if not return_value:
                 if self.n != mark:
+                    if path.max_n < self.n:
+                        path.max_n = self.n
                     s_before = self.s[self.n] + f' ({self.n})'
                     self.n = mark
                     s_after = self.s[self.n] + f' ({self.n})'
                     print(s_before, f'--- unwind {name}---', s_after)
+                    print('\n'.join(path.path))
             return return_value
         return wrapper

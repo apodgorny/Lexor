@@ -1,22 +1,9 @@
 from lexor.LexorSynthax import LexorSynthax
 from lexor.ParsePath import ParsePath
-
-class Unexpected(Exception):
-    def __init__(self, path, expected_list, found_char):
-        self.path = ' =>\n'.join(path)
-        self.expected = expected_list
-        self.found = found_char
-
-    def __str__(self):
-        return f'ERROR: Unexpected token\n{self.path}\nexpected {" or ".join(self.expected)}, found "{self.found}"'
-
-class CyclicRecursion(Exception):
-    def __init__(self, path):
-        self.path = ' =>\n'.join(path)
-
-    def __str__(self):
-        return f'ERROR: Cyclic recursion\n{self.path}\n'
-
+from lexor.Exceptions import (
+    CyclicRecursionException,
+    UnexpectedTokenException
+)
 
 class Lexor:
     SPACES = [' ', '\n', '\t', '\r']
@@ -243,9 +230,9 @@ class Lexor:
 
         try:
             self._get_phrase(self.config['main'], True)
-        except Unexpected as e:
+        except UnexpectedTokenException as e:
             exception = e
-        except CyclicRecursion as e:
+        except CyclicRecursionException as e:
             exception = e
 
         print('=' * 30 + '\n')
