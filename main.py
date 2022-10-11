@@ -1,9 +1,9 @@
 from lexor import Lexor
 
-with open('data/code.txt') as file:
+with open('data/code.calculator') as file:
     code = file.read()
 
-lexor = Lexor('data/synthax.json')
+lexor = Lexor('data/calculator.json')
 lexor.run(code)
 
 
