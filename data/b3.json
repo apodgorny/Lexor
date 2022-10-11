@@ -48,10 +48,10 @@
 			},
 
 			"P_THING_OR_SCOPE": {
-				"or": ["W_THING", "P_SCOPE"]
+				"or": ["P_THING", "P_SCOPE"]
 			},
 			"P_THING": {
-				"or": ["P_SCOPE", "W_THING", "W_QUESTION"],
+				"or": ["W_THING"],
 				"call": true
 			}
 		},
@@ -61,8 +61,7 @@
 				"call": true
 			},
 			"W_QUESTION": {
-				"syllables": ["S_QUESTION"],
-				"call": true
+				"syllables": ["S_QUESTION"]
 			},
 			"W_SCOPE_OPEN": {
 				"syllables": ["S_SCOPE_OPEN"]

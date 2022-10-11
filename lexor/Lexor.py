@@ -23,6 +23,7 @@ class Lexor:
         self.path        = None
         self.log         = None
 
+
     def error_unexpected(self, expected_list):
         # raise Unexpected(self.path.path, expected_list, self.s[self.n])
         pass
@@ -206,7 +207,7 @@ class Lexor:
 
         return node
 
-    def run(self, code: str):
+    def run(self, code: str, exec):
         pre  = self.config["prepend_with"]
         post = self.config["append_with"]
 
@@ -238,6 +239,8 @@ class Lexor:
         else:
             print(node)
         print('=' * 30)
+
+        exec.execute(node)
 
 
 
