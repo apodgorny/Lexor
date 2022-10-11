@@ -33,6 +33,8 @@ class LexorSynthax:
                 phrase['space'] = True
             if not isinstance(phrase['space'], bool):
                 raise SynthaxError(f'Attribute "space" must be boolean in phrase "{name}"')
+            if not 'call' in phrase:
+                phrase['call'] = False
 
             selector_phrase_count = 0
             if 'or' in phrase: selector_phrase_count += 1
@@ -56,6 +58,8 @@ class LexorSynthax:
                 raise SynthaxError(f'Word must specify "syllables": [] in word "{name}"')
             if not isinstance(word['syllables'], list):
                 raise SynthaxError(f'Attribute "syllables" must be an array in word "{name}')
+            if not 'call' in word:
+                word['call'] = False
 
     @staticmethod
     def _assert_syllables_synthax(syllables):

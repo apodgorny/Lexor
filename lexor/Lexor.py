@@ -4,6 +4,7 @@ from lexor.Exceptions import (
     CyclicRecursionException,
     UnexpectedTokenException
 )
+from library.TokenTree import TokenNode, TokenTree
 
 class Lexor:
     SPACES = [' ', '\n', '\t', '\r']
@@ -43,7 +44,6 @@ class Lexor:
     def _is_phrase(self, name) : return name in self.synthax['PHRASES']
     def _is_word(self, name)   : return name in self.synthax['WORDS']
 
-    @ParsePath.collect
     def _get_letters(self, name, max_length):
         letters = self.synthax['LETTERS'][name]
         s = ''
@@ -81,6 +81,7 @@ class Lexor:
     @ParsePath.mark_unwind
     def _get_word(self, name):
         word = self.synthax['WORDS'][name]
+        node = None
         s = ''
         got_all = True
         self.log(f'[ {name}')
@@ -97,96 +98,93 @@ class Lexor:
             s = None
         else:
             self.log(f'] {name} => {s}')
-            print(s)
+            node = TokenNode(s, word['call'])
 
-        return s
+        return node
 
-    def _get_and_phrase(self, phrase, required):
-        all_words = []
+    def _get_and_phrase(self, name):
+        phrase = self.synthax['PHRASES'][name]
+        node = TokenNode(name, phrase['call'])
         got_all = True
         for name in phrase['and']:
+            new_node = None
             self._get_spaces(phrase['space'])
+
             if self._is_phrase(name):                           # phrase
-                words = self._get_phrase(name, True)
-                if words:
-                    all_words += words
-                else:
-                    got_all = False
-                    break
+                new_node = self._get_phrase(name)
             else:                                               # word
-                word = self._get_word(name)
-                if word:
-                    all_words.append(word)
+                new_node = self._get_word(name)
+
+            if new_node:
+                if new_node.call:
+                    node.append(new_node)
                 else:
-                    got_all = False
-                    break
+                    node.children += new_node.children
+            else:
+                got_all = False
+                break
 
         if not got_all:
-            if required:
-                self.error_unexpected([name])
-            else:
-                all_words = None
+            node = None
 
-        return all_words
+        return node
 
-    def _get_or_phrase(self, phrase, required):
-        words = []
+    def _get_or_phrase(self, name):
+        phrase = self.synthax['PHRASES'][name]
+        node = TokenNode(name, phrase['call'])
         got_any = False
         for name in phrase['or']:
+            new_node = None
             self._get_spaces(phrase['space'])
+
             if self._is_phrase(name):                           # phrase
-                new_words = self._get_phrase(name, False)
-                if new_words:
-                    got_any = True
-                    words += new_words
-                    break
+                new_node = self._get_phrase(name)
             else:                                               # word
-                word = self._get_word(name)
-                if word:
-                    words.append(word)
-                    got_any = True
-                    break
+                new_node = self._get_word(name)
+
+            if new_node:
+                if new_node.call:
+                    node.append(new_node)
+                else:
+                    node.children += new_node.children
+                got_any = True
+                break
 
         if not got_any:
-            if required:
-                self.error_unexpected(phrase['or'])
-            else:
-                words = None
+            node = None
 
-        return words
+        return node
 
-    def _get_orplus_phrase(self, phrase, required):
-        words = []
+    def _get_orplus_phrase(self, name):
+        phrase = self.synthax['PHRASES'][name]
+        node = TokenNode(name, phrase['call'])
         got_any = False
         for name in phrase['or+']:
+            new_node = None
             self._get_spaces(phrase['space'])
+
             if self._is_phrase(name):                           # phrase
-                new_words = self._get_phrase(name, False)
-                if new_words:
-                    got_any = True
-                    words += new_words
+                new_node = self._get_phrase(name)
             else:                                               # word
-                word = self._get_word(name)
-                if word:
-                    words.append(word)
-                    got_any = True
+                new_node = self._get_word(name)
+
+            if new_node:
+                if new_node.call:
+                    node.append(new_node)
+                else:
+                    node.children += new_node.children
+
+                got_any = True
 
         if not got_any:
-            if required:
-                self.error_unexpected(phrase['or+'])
-            else:
-                words = None
+            node = None
 
-        return words
+        return node
 
 
     @ParsePath.collect
     @ParsePath.mark_unwind
-    def _get_phrase(self, name, required):
-        # if self.last_phrase == name:
-        #     raise CyclicRecursion(self.path.path)
-        #     return None
-
+    def _get_phrase(self, name):
         if self.eof:
             print('EOF')
             return
@@ -195,18 +193,18 @@ class Lexor:
             self.last_phrase = name
 
         phrase = self.synthax['PHRASES'][name]
-        words = []
+        node = None
 
-        self.log(f'[ {name} {"*" if required else ""}')
+        self.log(f'[ {name}')
 
-        if   'and' in phrase : words = self._get_and_phrase(phrase, required)
-        elif 'or'  in phrase : words = self._get_or_phrase(phrase, required)
-        elif 'or+' in phrase : words = self._get_orplus_phrase(phrase, required)
+        if   'and' in phrase : node = self._get_and_phrase(name)
+        elif 'or'  in phrase : node = self._get_or_phrase(name)
+        elif 'or+' in phrase : node = self._get_orplus_phrase(name)
 
-        if words : self.log(f'] {name} => ({" ".join(words)})')
+        if node : self.log(f'] {name} => (some value)')
         else     : self.log(f'] {name} => NONE')
 
-        return words
+        return node
 
     def run(self, code: str):
         pre  = self.config["prepend_with"]
@@ -227,16 +225,18 @@ class Lexor:
         print(line)
 
         exception = ''
-
         try:
-            self._get_phrase(self.config['main'], True)
+            node = self._get_phrase(self.config['main'])
         except UnexpectedTokenException as e:
             exception = e
         except CyclicRecursionException as e:
             exception = e
 
         print('=' * 30 + '\n')
-        print(exception)
+        if exception:
+            print(exception)
+        else:
+            print(node)
         print('=' * 30)
 
 

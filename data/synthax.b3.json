@@ -9,7 +9,8 @@
 	"SYNTHAX": {
 		"PHRASES": {
 			"P_LIST": {
-				"or+": ["P_EXPRESSION_OR_SCOPE", "P_LIST"]
+				"or+": ["P_EXPRESSION_OR_SCOPE", "P_LIST"],
+				"call": false
 			},
 			"P_EXPRESSION_OR_SCOPE": {
 				"or": ["P_SCOPE", "P_EXPRESSION"]
@@ -22,40 +23,46 @@
 			},
 
 			"P_TRT": {
-				"and": ["P_THING_OR_SCOPE", "P_THING_OR_SCOPE", "P_THING_OR_SCOPE"]
+				"and": ["P_THING_OR_SCOPE", "P_THING_OR_SCOPE", "P_THING_OR_SCOPE"],
+				"call": true
 			},
 			"P_Q_1": {
-				"and": ["W_QUESTION", "P_THING_OR_SCOPE", "P_THING_OR_SCOPE"]
+				"and": ["W_QUESTION", "P_THING_OR_SCOPE", "P_THING_OR_SCOPE"],
+				"call": true
 			},
 			"P_Q_2": {
-				"and": ["P_THING_OR_SCOPE", "W_QUESTION", "P_THING_OR_SCOPE"]
+				"and": ["P_THING_OR_SCOPE", "W_QUESTION", "P_THING_OR_SCOPE"],
+				"call": true
 			},
 			"P_Q_3": {
-				"and": ["P_THING_OR_SCOPE", "P_THING_OR_SCOPE", "W_QUESTION"]
+				"and": ["P_THING_OR_SCOPE", "P_THING_OR_SCOPE", "W_QUESTION"],
+				"call": true
 			},
 			"P_Q_12": {
-				"and": ["W_QUESTION", "W_QUESTION", "P_THING_OR_SCOPE"]
+				"and": ["W_QUESTION", "W_QUESTION", "P_THING_OR_SCOPE"],
+				"call": true
 			},
 			"P_Q_23": {
-				"and": ["P_THING_OR_SCOPE", "W_QUESTION", "W_QUESTION"]
+				"and": ["P_THING_OR_SCOPE", "W_QUESTION", "W_QUESTION"],
+				"call": true
 			},
 
 			"P_THING_OR_SCOPE": {
 				"or": ["W_THING", "P_SCOPE"]
 			},
 			"P_THING": {
-				"or": ["P_SCOPE", "W_THING", "W_QUESTION"]
+				"or": ["P_SCOPE", "W_THING", "W_QUESTION"],
+				"call": true
 			}
 		},
 		"WORDS": {
 			"W_THING":{
-				"syllables": ["S_VALUE"]
-			},
-			"W_RELATION":{
-				"syllables": ["S_VALUE"]
+				"syllables": ["S_VALUE"],
+				"call": true
 			},
 			"W_QUESTION": {
-				"syllables": ["S_QUESTION"]
+				"syllables": ["S_QUESTION"],
+				"call": true
 			},
 			"W_SCOPE_OPEN": {
 				"syllables": ["S_SCOPE_OPEN"]

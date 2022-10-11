@@ -7,6 +7,7 @@ from lexor.Exceptions import (
     UnexpectedTokenException
 )
 
+
 class ParsePath:
     instance = None
     def __init__(self):
@@ -50,10 +51,10 @@ class ParsePath:
     def collect(f):
         path = ParsePath.get_instance()
         @wraps(f)
-        def wrapper(self, name, *args):
+        def wrapper(self, name):
             path.augment(self)
             path.push(f'{name} {self.n}')
-            return_value = f(self, name, *args)
+            return_value = f(self, name)
             path.pop()
             return return_value
         return wrapper
@@ -62,9 +63,9 @@ class ParsePath:
     def mark_unwind(f):
         path = ParsePath.get_instance()
         @wraps(f)
-        def wrapper(self, name, *args):
+        def wrapper(self, name):
             mark = self.n
-            return_value = f(self, name, *args)
+            return_value = f(self, name)
             if not return_value:
                 if self.n != mark:
                     if path.max_n < self.n:
@@ -73,6 +74,6 @@ class ParsePath:
                     self.n = mark
                     s_after = self.s[self.n] + f' ({self.n})'
                     print(s_before, f'--- unwind {name}---', s_after)
-                    print('\n'.join(path.path))
+                    # print('\n'.join(path.path))
             return return_value
         return wrapper

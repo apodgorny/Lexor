@@ -16,42 +16,51 @@
 
 			"P_SIMPLE_OR_SCOPE": {
 				"or": ["P_SCOPE", "P_SIMPLE"],
-				"space": true
+				"call": true
 			},
 			"P_SIMPLE": {
-				"and": ["P_OPERAND_PHRASE", "W_OPERATOR", "P_OPERAND_PHRASE"],
-				"space": true
+				"or+": ["P_OPERAND_PHRASE", "P_AND_MORE"],
+				"call": true
+			},
+			"P_AND_MORE": {
+				"and": ["W_OPERATOR", "P_SIMPLE"],
+				"call": true
 			},
 			"P_OPERAND_PHRASE": {
 				"or": ["P_OPERAND", "P_SCOPE", "P_SIMPLE"],
-				"space": true
+				"call": true
 			},
 			"P_OPERAND": {
 				"or": ["W_FLOAT", "W_INT"],
-				"space": true
+				"call": true
 			},
 			"P_SCOPE": {
 				"and": ["W_SCOPE_OPEN", "P_SIMPLE", "W_SCOPE_CLOSE"],
-				"space": true
+				"call": true
 			}
 		},
 		"WORDS": {
 			"comment": "Words are collected by lexor, consist of syllables",
 
 			"W_OPERATOR":{
-				"syllables": ["S_OPERATOR"]
+				"syllables": ["S_OPERATOR"],
+				"call": true
 			},
 			"W_FLOAT": {
-				"syllables": ["S_DIGITS", "S_DOT", "S_DIGITS"]
+				"syllables": ["S_DIGITS", "S_DOT", "S_DIGITS"],
+				"call": true
 			},
 			"W_INT": {
-				"syllables": ["S_DIGITS"]
+				"syllables": ["S_DIGITS"],
+				"call": true
 			},
 			"W_SCOPE_OPEN": {
-				"syllables": ["S_SCOPE_OPEN"]
+				"syllables": ["S_SCOPE_OPEN"],
+				"call": true
 			},
 			"W_SCOPE_CLOSE": {
-				"syllables": ["S_SCOPE_CLOSE"]
+				"syllables": ["S_SCOPE_CLOSE"],
+				"call": true
 			}
 		},
 		"SYLLABLES": {
@@ -82,7 +91,7 @@
 			"comment": "Letters are sets of characters",
 
 			"L_DIGIT": "0123456789",
-			"L_OPERATOR": "*/+*",
+			"L_OPERATOR": "-+/*",
 			"L_DOT": ".",
 			"L_SCOPE_OPEN": "(",
 			"L_SCOPE_CLOSE": ")"
