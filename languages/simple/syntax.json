@@ -19,32 +19,47 @@
 				"and": ["W_SCOPE_OPEN", "P_EXPRESSION", "W_SCOPE_CLOSE"]
 			},
 			"P_EXPRESSION": {
-				"or": ["P_TRT", "P_Q_1", "P_Q_2", "P_Q_3", "P_Q_12", "P_Q_23"]
+				"or": ["P_ABC", "P_QBA", "P_AQB", "P_ABQ", "P_A_QQ", "P_QQ_C"]
 			},
 
-			"P_TRT": {
+
+			"P_ABC": {
 				"and": ["P_THING_OR_SCOPE", "P_THING_OR_SCOPE", "P_THING_OR_SCOPE"],
 				"call": true
 			},
-			"P_Q_1": {
+			"P_QBA": {
 				"and": ["W_QUESTION", "P_THING_OR_SCOPE", "P_THING_OR_SCOPE"],
 				"call": true
 			},
-			"P_Q_2": {
+			"P_AQB": {
 				"and": ["P_THING_OR_SCOPE", "W_QUESTION", "P_THING_OR_SCOPE"],
 				"call": true
 			},
-			"P_Q_3": {
+			"P_ABQ": {
 				"and": ["P_THING_OR_SCOPE", "P_THING_OR_SCOPE", "W_QUESTION"],
 				"call": true
 			},
-			"P_Q_12": {
+			"P_QQC": {
 				"and": ["W_QUESTION", "W_QUESTION", "P_THING_OR_SCOPE"],
 				"call": true
 			},
-			"P_Q_23": {
+			"P_AQQ": {
 				"and": ["P_THING_OR_SCOPE", "W_QUESTION", "W_QUESTION"],
 				"call": true
+			},
+
+			"P_SQQ": {
+				"and": ["W_SCOPE_OPEN", "P_QQ", "W_SCOPE_CLOSE"]
+			},
+			"P_QQ": {
+				"or": ["P_QQC", "P_AQQ"]
+			},
+
+			"P_A_QQ": {
+				"and": ["P_THING_OR_SCOPE", "P_SQQ"]
+			},
+			"P_QQ_C": {
+				"and": ["P_SQQ", "P_THING_OR_SCOPE"]
 			},
 
 			"P_THING_OR_SCOPE": {
@@ -61,7 +76,8 @@
 				"call": true
 			},
 			"W_QUESTION": {
-				"syllables": ["S_QUESTION"]
+				"syllables": ["S_QUESTION"],
+				"call": true
 			},
 			"W_SCOPE_OPEN": {
 				"syllables": ["S_SCOPE_OPEN"]

@@ -1,7 +1,9 @@
 from functools import wraps
 import types
+import math
 
-from lexor.CycleDetector import CycleDetector
+from lexor.RecursionDetector import RecursionDetector
+from lexor.CodePoint import CodePoint
 from lexor.Exceptions import (
     CyclicRecursionException,
     UnexpectedTokenException
@@ -12,30 +14,35 @@ class ParsePath:
     instance = None
     def __init__(self):
         self.path = []
+        self.full_path = []
         self.lexor = None
         self.is_augmented = False
-        self.cycle_detector = CycleDetector()
-        self.max_n = 0
+        self.recursion_detector = RecursionDetector(3)
 
-    def push(self, name):
-        detected = self.cycle_detector.detect(self.path, name)
-        self.path.append(name)
+    def push(self, token):
+        detected = self.recursion_detector.detect(self.full_path, token)
+        self.path.append(CodePoint(self.lexor.code, token))
+        self.full_path.append(token)
         if detected:
-            raise UnexpectedTokenException(self.path, [], self.lexor.s[self.max_n])
+            # with open ('fragment.txt', 'a') as f: f.write (f'{self.recursion_detector.fragment}\n')
+            raise UnexpectedTokenException(self.lexor.code.max)
             # raise CyclicRecursionException(self.path)
 
-    def pop(self):
-        self.path.pop()
+    def pop(self, result):
+        code_point = self.path.pop()
+        if not result:
+            self.lexor.code.unwind(code_point)
 
     def augment(self, lexor):
         if not self.is_augmented:
             self.lexor = lexor
             parse_path = self
             def lexor_log(self, *args):
-                level = len(parse_path.path)
-                indent = '\t' * (level-1)
-                indent += ' ' * (level-1)
-                print(indent, *args)
+                if self.verbose:
+                    level = len(parse_path.path)
+                    indent = ' │\t' * (level-1)
+                    value = self.code.at()
+                    print(value.ljust(15, ' '), indent, *args)
 
             lexor.log = types.MethodType(lexor_log, lexor)
             setattr(lexor, 'path', parse_path)
@@ -48,32 +55,13 @@ class ParsePath:
         return ParsePath.instance
 
     @staticmethod
-    def collect(f):
+    def control(f):
         path = ParsePath.get_instance()
         @wraps(f)
         def wrapper(self, name):
             path.augment(self)
-            path.push(f'{name} {self.n}')
+            path.push(f'{name} {self.code.n}')
             return_value = f(self, name)
-            path.pop()
-            return return_value
-        return wrapper
-
-    @staticmethod
-    def mark_unwind(f):
-        path = ParsePath.get_instance()
-        @wraps(f)
-        def wrapper(self, name):
-            mark = self.n
-            return_value = f(self, name)
-            if not return_value:
-                if self.n != mark:
-                    if path.max_n < self.n:
-                        path.max_n = self.n
-                    s_before = self.s[self.n] + f' ({self.n})'
-                    self.n = mark
-                    s_after = self.s[self.n] + f' ({self.n})'
-                    print(s_before, f'--- unwind {name}---', s_after)
-                    # print('\n'.join(path.path))
+            path.pop(return_value)
             return return_value
         return wrapper

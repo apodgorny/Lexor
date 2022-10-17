@@ -1,4 +1,4 @@
-class Executor:
+class BaseExecutor:
 
     def execute(self, node):
         if len(node.children) > 0:

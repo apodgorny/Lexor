@@ -1,9 +1,23 @@
 from library.Tree import Node, Tree
 
 class TokenNode(Node):
-    def __init__(self, name, call):
+    def __init__(self, name, call, is_actual_value=False):
         super().__init__(name)
-        self.call = call
+        self.call   = call
+        self.is_actual = is_actual_value
+
+    def __str__(self):
+        value = ''
+        if len(self.children) > 0:
+            child_values = []
+            for child in self.children:
+                child_values.append(child.__str__())
+                value = f"{' '.join(child_values)}"
+                if len(child_values) > 1:
+                    value = f"({value})"
+        else:
+            value = self.value
+        return value
 
 class TokenTree(Tree):
     def __init__(self, root_value):
