@@ -6,15 +6,15 @@ class TokenNode(Node):
         self.call   = call
         self.is_actual = is_actual_value
 
-    def __str__(self):
+    def expression_view(self):
         value = ''
         if len(self.children) > 0:
             child_values = []
             for child in self.children:
-                child_values.append(child.__str__())
+                child_values.append(child.expression_view())
                 value = f"{' '.join(child_values)}"
-                if len(child_values) > 1:
-                    value = f"({value})"
+                # if len(child_values) > 1:
+                #     value = f"({value})"
         else:
             value = self.value
         return value

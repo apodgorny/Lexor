@@ -11,8 +11,6 @@ class CodeMap:
         self.max     = None
         self.verbose = verbose
 
-        self.line    = ''
-
     @property
     def c(self):
         return self.s[self.n]
@@ -24,16 +22,15 @@ class CodeMap:
             if self.c == '\n':
                 self.col = 0
                 self.row += 1
-                self.line = ''
             else:
                 self.col  += 1
-                self.line += self.c
             self.n += 1
 
     def at(self):
         max_len = 10
-        length  = max_len if self.n >= max_len else self.n
-        return self.s[self.n - length : self.n]
+        line = self.line_at(self.n)
+        length = min(self.col, max_len)
+        return line[self.col - length : self.col]
 
     def mark(self):
         return CodePoint(self)
@@ -60,10 +57,10 @@ class CodeMap:
     def line_at(self, n):
         i = n
         line = ''
-        while self.s[i] != '\n' and i >= 0:
+        while i >= 0 and self.s[i] != '\n':
             line = self.s[i] + line
             i -= 1
-        i = n
+        i = n + 1
         while i < len(self.s) and self.s[i] != '\n':
             line += self.s[i]
             i += 1

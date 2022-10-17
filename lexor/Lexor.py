@@ -29,6 +29,7 @@ class Lexor:
     def log_header(self):
         program = f'{self.config["name"]} (Version {self.config["version"]})'
         line    = '=' * len(program)
+
         print(line)
         print(program)
         print(line)
@@ -43,36 +44,25 @@ class Lexor:
         for n in range(max_length):
             c = self.code.c
             if c in self.synthax['LETTERS'][name]:
-                # self.log( f'{name} {self.s[self.n]} => ({s})')
                 s += c
                 self.code.advance()
             else:
-                # self.log(f'{name} {self.s[self.n]}')
                 break
 
         return s or None
 
     @ParsePath.control
     def _get_syllable(self, name):
-        # self.log(f'[ {name}')
-
         syllable = self.synthax['SYLLABLES'][name]
-        letters = self._get_letters(syllable['letters'], syllable['max'])
-
-        # if letters:
-            # self.log(f'] {name} => ({letters})')
-        # else:
-            # self.log(f'] {name} => None')
-
-        return letters
+        return self._get_letters(syllable['letters'], syllable['max'])
 
     @ParsePath.control
     def _get_word(self, name):
-        word = self.synthax['WORDS'][name]
-        node = None
-        s = ''
+        word    = self.synthax['WORDS'][name]
+        node    = None
         got_all = True
-        # self.log(f'[ {name}')
+        s       = ''
+
         for syllable_name in word['syllables']:
             syllable = self._get_syllable(syllable_name)
             if syllable:
@@ -81,31 +71,24 @@ class Lexor:
                 got_all = False
                 break
 
-        if not got_all:
-            # self.log(f'] {name}')
-            s = None
-        else:
-            # self.log(f'] {name} => {s}')
+        if got_all:
             node = TokenNode(s, word['call'], True)
 
         return node
 
     def _get_and_phrase(self, name):
-        phrase = self.synthax['PHRASES'][name]
-        node = TokenNode(name, phrase['call'])
+        phrase  = self.synthax['PHRASES'][name]
+        node    = TokenNode(name, phrase['call'])
         got_all = True
+
         for name in phrase['and']:
             if phrase['space']: self.code.skip()
-            if self._is_phrase(name):                           # phrase
-                new_node = self._get_phrase(name)
-            else:                                               # word
-                new_node = self._get_word(name)
+            if self._is_phrase(name) : new_node = self._get_phrase(name)
+            else                     : new_node = self._get_word(name)
 
             if new_node:
-                if new_node.call:
-                    node.append(new_node)
-                else:
-                    node.children += new_node.children
+                if new_node.call : node.append(new_node)
+                else             : node.children += new_node.children
             else:
                 got_all = False
                 break
@@ -115,21 +98,18 @@ class Lexor:
         return node
 
     def _get_or_phrase(self, name):
-        phrase = self.synthax['PHRASES'][name]
-        node = TokenNode(name, phrase['call'])
+        phrase  = self.synthax['PHRASES'][name]
+        node    = TokenNode(name, phrase['call'])
         got_any = False
+
         for name in phrase['or']:
             if phrase['space']: self.code.skip()
-            if self._is_phrase(name):                           # phrase
-                new_node = self._get_phrase(name)
-            else:                                               # word
-                new_node = self._get_word(name)
+            if self._is_phrase(name) : new_node = self._get_phrase(name)
+            else                     : new_node = self._get_word(name)
 
             if new_node:
-                if new_node.call:
-                    node.append(new_node)
-                else:
-                    node.children += new_node.children
+                if new_node.call : node.append(new_node)
+                else             : node.children += new_node.children
                 got_any = True
                 break
 
@@ -138,21 +118,18 @@ class Lexor:
         return node
 
     def _get_orplus_phrase(self, name):
-        phrase = self.synthax['PHRASES'][name]
-        node = TokenNode(name, phrase['call'])
+        phrase  = self.synthax['PHRASES'][name]
+        node    = TokenNode(name, phrase['call'])
         got_any = False
+
         for name in phrase['or+']:
             if phrase['space']: self.code.skip()
-            if self._is_phrase(name):                           # phrase
-                new_node = self._get_phrase(name)
-            else:                                               # word
-                new_node = self._get_word(name)
+            if self._is_phrase(name) : new_node = self._get_phrase(name)
+            else                     : new_node = self._get_word(name)
 
             if new_node:
-                if new_node.call:
-                    node.append(new_node)
-                else:
-                    node.children += new_node.children
+                if new_node.call : node.append(new_node)
+                else             : node.children += new_node.children
 
                 got_any = True
 
@@ -167,7 +144,7 @@ class Lexor:
             return
 
         phrase = self.synthax['PHRASES'][name]
-        node = None
+        node   = None
 
         self.log(f'[ {name}')
 
@@ -175,7 +152,7 @@ class Lexor:
         elif 'or'  in phrase : node = self._get_or_phrase(name)
         elif 'or+' in phrase : node = self._get_orplus_phrase(name)
 
-        if node : self.log(f'] {name} => ({node})')
+        if node : self.log(f'] {name} => ({node.expression_view()})')
         else    : self.log(f'] {name} => NONE')
 
         return node
@@ -197,6 +174,8 @@ class Lexor:
             exception = e
 
         self.log_result(exception, node)
+
+        print(node)
 
         if executor and node:
             executor.execute(node)
