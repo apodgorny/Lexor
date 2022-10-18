@@ -1,11 +1,9 @@
 from functools import wraps
 import types
-import math
 
-from lexor.RecursionDetector import RecursionDetector
+from library.RecursionDetector import RecursionDetector
 from lexor.CodePoint import CodePoint
 from lexor.Exceptions import (
-    CyclicRecursionException,
     UnexpectedTokenException
 )
 

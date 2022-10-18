@@ -42,6 +42,8 @@ class Lexor:
     def _get_letters(self, name, max_length):
         s = ''
         for n in range(max_length):
+            if self.code.eof:
+                break
             c = self.code.c
             if c in self.synthax['LETTERS'][name]:
                 s += c
@@ -174,8 +176,6 @@ class Lexor:
             exception = e
 
         self.log_result(exception, node)
-
-        print(node)
 
         if executor and node:
             executor.execute(node)

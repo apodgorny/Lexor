@@ -16,7 +16,7 @@ class CodeMap:
         return self.s[self.n]
 
     def advance(self):
-        if self.n >= len(self.s) - 2:
+        if self.n >= len(self.s) - 1:
             self.eof = True
         else:
             if self.c == '\n':

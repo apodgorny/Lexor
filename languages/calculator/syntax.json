@@ -3,7 +3,7 @@
 		"comment": "Config is a place where we store language settings",
 
 		"name": "Calculator",
-		"main": "P_SIMPLE_OR_SCOPE",
+		"main": "P_MAIN",
 		"version": "0.1",
 		"prepend_with": "(",
 		"append_with": ")"
@@ -14,29 +14,26 @@
 		"PHRASES": {
 			"comment": "Phrases consist of and/or sequences of phrases/words",
 
-			"P_SIMPLE_OR_SCOPE": {
-				"or": ["P_SCOPE", "P_SIMPLE"],
-				"call": true
+			"P_MAIN": {
+				"or": ["P_SCOPE", "P_SIMPLE"]
 			},
 			"P_SIMPLE": {
-				"or+": ["P_OPERAND_PHRASE", "P_AND_MORE"],
-				"call": true
+				"or+": ["P_OPERAND_PHRASE", "P_AND_MORE"]
 			},
 			"P_AND_MORE": {
-				"and": ["W_OPERATOR", "P_SIMPLE"],
-				"call": true
+				"and": ["P_OPERATOR", "P_SIMPLE"]
 			},
 			"P_OPERAND_PHRASE": {
-				"or": ["P_OPERAND", "P_SCOPE", "P_SIMPLE"],
-				"call": true
+				"or": ["P_OPERAND", "P_SCOPE", "P_SIMPLE"]
 			},
 			"P_OPERAND": {
-				"or": ["W_FLOAT", "W_INT"],
-				"call": true
+				"or": ["W_FLOAT", "W_INT"]
 			},
 			"P_SCOPE": {
-				"and": ["W_SCOPE_OPEN", "P_SIMPLE", "W_SCOPE_CLOSE"],
-				"call": true
+				"and": ["W_SCOPE_OPEN", "P_SIMPLE", "W_SCOPE_CLOSE"]
+			},
+			"P_OPERATOR": {
+				"and": ["W_OPERATOR"]
 			}
 		},
 		"WORDS": {

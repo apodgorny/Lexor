@@ -77,7 +77,7 @@ class ExpressionTree:
             right = self.calculate(node.rchild)
             result = self.OPERATION[node.value](left, right)
         else:
-            result = node.value
+            result = float(node.value)
 
         return result
 
