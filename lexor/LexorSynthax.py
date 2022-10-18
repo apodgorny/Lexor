@@ -13,18 +13,18 @@ class LexorSynthax:
 
     @staticmethod
     def _assert_sections(data):
-        LexorSynthax._assert_keys('synthax file', data, [
-            'CONFIG', 'SYNTHAX'
+        LexorSynthax._assert_keys('syntax file', data, [
+            'CONFIG', 'SYNTAX'
         ])
         LexorSynthax._assert_keys('CONFIG section', data['CONFIG'], [
             'main', 'name', 'version', 'prepend_with', 'append_with'
         ])
-        LexorSynthax._assert_keys('SYNTHAX section', data['SYNTHAX'], [
+        LexorSynthax._assert_keys('SYNTAX section', data['SYNTAX'], [
             'PHRASES', 'WORDS', 'SYLLABLES', 'LETTERS'
         ])
 
     @staticmethod
-    def _assert_phrases_synthax(phrases):
+    def _assert_phrases_syntax(phrases):
         for name, phrase in phrases.items():
             if name == 'comment': continue
             if not name.startswith('P_'):
@@ -49,7 +49,7 @@ class LexorSynthax:
                 raise SynthaxError(f'Attributes "and", "or" must be arrays in phrase "{name}')
 
     @staticmethod
-    def _assert_words_synthax(words):
+    def _assert_words_syntax(words):
         for name, word in words.items():
             if name == 'comment': continue
             if not name.startswith('W_'):
@@ -62,7 +62,7 @@ class LexorSynthax:
                 word['call'] = False
 
     @staticmethod
-    def _assert_syllables_synthax(syllables):
+    def _assert_syllables_syntax(syllables):
         for name, syllable in syllables.items():
             if name == 'comment': continue
             if not name.startswith('S_'):
@@ -77,7 +77,7 @@ class LexorSynthax:
                 raise SynthaxError(f'Attribute "max" must be an array in syllable "{name}')
 
     @staticmethod
-    def _assert_letters_synthax(letters):
+    def _assert_letters_syntax(letters):
         for name, letter in letters.items():
             if name == 'comment': continue
             if not name.startswith('L_'):
@@ -115,23 +115,23 @@ class LexorSynthax:
                 raise IntegrityError(f'{ref} is not resolvable in LETTERS')
 
     @staticmethod
-    def get_synthax(synthax_file_name):
-        with open(synthax_file_name) as synthax_file:
-            data = json.load(synthax_file)
+    def get_syntax(syntax_file_name):
+        with open(syntax_file_name) as syntax_file:
+            data = json.load(syntax_file)
 
         try:
-            syn = data['SYNTHAX']
+            syn = data['SYNTAX']
             LexorSynthax._assert_sections(data)
-            LexorSynthax._assert_phrases_synthax(syn['PHRASES'])
-            LexorSynthax._assert_words_synthax(syn['WORDS'])
-            LexorSynthax._assert_syllables_synthax(syn['SYLLABLES'])
-            LexorSynthax._assert_letters_synthax(syn['LETTERS'])
+            LexorSynthax._assert_phrases_syntax(syn['PHRASES'])
+            LexorSynthax._assert_words_syntax(syn['WORDS'])
+            LexorSynthax._assert_syllables_syntax(syn['SYLLABLES'])
+            LexorSynthax._assert_letters_syntax(syn['LETTERS'])
             LexorSynthax._assert_integrity(syn)
         except SynthaxError as e:
-            print(f'Synthax error in "{synthax_file_name}": {str(e)}')
+            print(f'Synthax error in "{syntax_file_name}": {str(e)}')
             exit(1)
         except IntegrityError as e:
-            print(f'Integrity error in "{synthax_file_name}": {str(e)}')
+            print(f'Integrity error in "{syntax_file_name}": {str(e)}')
             exit(2)
 
         return data

@@ -8,11 +8,11 @@ from lexor.Exceptions import (
 from library.TokenTree import TokenNode
 
 class Lexor:
-    def __init__(self, synthax_file_name):
-        data = LexorSynthax.get_synthax(synthax_file_name)
+    def __init__(self, syntax_file_name):
+        data = LexorSynthax.get_syntax(syntax_file_name)
 
         self.config  = data['CONFIG']
-        self.synthax = data['SYNTHAX']
+        self.syntax = data['SYNTAX']
 
         self.path        = None
         self.log         = None
@@ -36,8 +36,8 @@ class Lexor:
         print(self.code.s)
         print(line)
 
-    def _is_phrase(self, name) : return name in self.synthax['PHRASES']
-    def _is_word(self, name)   : return name in self.synthax['WORDS']
+    def _is_phrase(self, name) : return name in self.syntax['PHRASES']
+    def _is_word(self, name)   : return name in self.syntax['WORDS']
 
     def _get_letters(self, name, max_length):
         s = ''
@@ -45,7 +45,7 @@ class Lexor:
             if self.code.eof:
                 break
             c = self.code.c
-            if c in self.synthax['LETTERS'][name]:
+            if c in self.syntax['LETTERS'][name]:
                 s += c
                 self.code.advance()
             else:
@@ -55,12 +55,12 @@ class Lexor:
 
     @ParsePath.control
     def _get_syllable(self, name):
-        syllable = self.synthax['SYLLABLES'][name]
+        syllable = self.syntax['SYLLABLES'][name]
         return self._get_letters(syllable['letters'], syllable['max'])
 
     @ParsePath.control
     def _get_word(self, name):
-        word    = self.synthax['WORDS'][name]
+        word    = self.syntax['WORDS'][name]
         node    = None
         got_all = True
         s       = ''
@@ -79,7 +79,7 @@ class Lexor:
         return node
 
     def _get_and_phrase(self, name):
-        phrase  = self.synthax['PHRASES'][name]
+        phrase  = self.syntax['PHRASES'][name]
         node    = TokenNode(name, phrase['call'])
         got_all = True
 
@@ -100,7 +100,7 @@ class Lexor:
         return node
 
     def _get_or_phrase(self, name):
-        phrase  = self.synthax['PHRASES'][name]
+        phrase  = self.syntax['PHRASES'][name]
         node    = TokenNode(name, phrase['call'])
         got_any = False
 
@@ -120,7 +120,7 @@ class Lexor:
         return node
 
     def _get_orplus_phrase(self, name):
-        phrase  = self.synthax['PHRASES'][name]
+        phrase  = self.syntax['PHRASES'][name]
         node    = TokenNode(name, phrase['call'])
         got_any = False
 
@@ -145,7 +145,7 @@ class Lexor:
         if self.code.eof:
             return
 
-        phrase = self.synthax['PHRASES'][name]
+        phrase = self.syntax['PHRASES'][name]
         node   = None
 
         self.log(f'[ {name}')

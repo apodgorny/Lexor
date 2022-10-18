@@ -8,7 +8,7 @@
 		"prepend_with": "(",
 		"append_with": ")"
 	},
-	"SYNTHAX": {
+	"SYNTAX": {
 		"comment": "Synthax contains PHRASES/WORDS/SYLLABLES/LETTERS",
 
 		"PHRASES": {
