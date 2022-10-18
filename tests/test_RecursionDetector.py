@@ -1,5 +1,5 @@
 import pytest
-from lexor import RecursionDetector
+from library.RecursionDetector import RecursionDetector
 
 class Test_RecursionDetector:
     def test_suspicion_arise(self):
