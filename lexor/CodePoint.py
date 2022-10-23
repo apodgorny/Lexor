@@ -28,8 +28,11 @@ class CodePoint:
     @property
     def excerpt(self):
         length = min(self.col, self.MAX_EXCERPT_LENGTH)
-        excerpt = self.line[self.col - length : self.col + 1]
-        pointer = '^'.rjust(len(excerpt) + 1, '_')
+        start = self.col - length
+        end = self.MAX_EXCERPT_LENGTH - start
+        half = self.line[start : self.col + 1]
+        excerpt = self.line[start : end]
+        pointer = '^'.rjust(len(half) + 1, '_')
         return f'{self.at}:\n"{excerpt}"\n{pointer}'
 
     def __str__(self):

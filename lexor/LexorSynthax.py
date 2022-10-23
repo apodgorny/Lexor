@@ -74,7 +74,11 @@ class LexorSynthax:
             if not 'max' in syllable:
                 raise SynthaxError(f'Word must specify "max": <int> in syllable "{name}"')
             if not isinstance(syllable['max'], int):
-                raise SynthaxError(f'Attribute "max" must be an array in syllable "{name}')
+                raise SynthaxError(f'Attribute "max" must be an integer in syllable "{name}')
+            if not 'inverse' in syllable:
+                syllable['inverse'] = False
+            if not isinstance(syllable['inverse'], bool):
+                raise SynthaxError(f'Attribute "inverse" must be a bool in syllable "{name}')
 
     @staticmethod
     def _assert_letters_syntax(letters):
