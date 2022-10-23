@@ -1,4 +1,4 @@
 from .Lexor import Lexor
-from .LexorSynthax import LexorSynthax
+from .LexorSyntax import LexorSyntax
 from .ParsePath import ParsePath
 from .Exceptions import * #noqa

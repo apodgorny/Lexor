@@ -1,4 +1,4 @@
-from lexor.LexorSynthax import LexorSynthax
+from lexor.LexorSyntax import LexorSyntax
 from lexor.ParsePath import ParsePath
 from lexor.CodeMap import CodeMap
 from lexor.Exceptions import (
@@ -9,7 +9,7 @@ from library.TokenTree import TokenNode
 
 class Lexor:
     def __init__(self, syntax_file_name):
-        data = LexorSynthax.get_syntax(syntax_file_name)
+        data = LexorSyntax.get_syntax(syntax_file_name)
 
         self.config  = data['CONFIG']
         self.syntax = data['SYNTAX']

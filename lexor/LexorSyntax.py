@@ -1,38 +1,68 @@
 import json
+import os
 
-class SynthaxError(Exception):  ...
+class SyntaxError(Exception):  ...
 class IntegrityError(Exception):  ...
 
 
-class LexorSynthax:
+class LexorSyntax:
+
+    @staticmethod
+    def _load(file_name):
+        with open(file_name) as f:
+            return json.load(f)
+
     @staticmethod
     def _assert_keys(dict_name, dict, keys):
         for key in keys:
             if not key in dict:
-                raise SynthaxError(f'No "{key}" section present in {dict_name}')
+                raise SyntaxError(f'No "{key}" section present in {dict_name}')
 
     @staticmethod
     def _assert_sections(data):
-        LexorSynthax._assert_keys('syntax file', data, [
+        LexorSyntax._assert_keys('syntax file', data, [
             'CONFIG', 'SYNTAX'
         ])
-        LexorSynthax._assert_keys('CONFIG section', data['CONFIG'], [
+        LexorSyntax._assert_keys('CONFIG section', data['CONFIG'], [
             'main', 'name', 'version', 'prepend_with', 'append_with'
         ])
-        LexorSynthax._assert_keys('SYNTAX section', data['SYNTAX'], [
+        LexorSyntax._assert_keys('SYNTAX section', data['SYNTAX'], [
             'PHRASES', 'WORDS', 'SYLLABLES', 'LETTERS'
         ])
 
     @staticmethod
+    def _process_comments(data):
+        has_comments = False
+        if isinstance(data, dict):
+            for name in data:
+                if name == '@COMMENT':
+                    has_comments = True
+                else:
+                    LexorSyntax._process_comments(data[name])
+        if has_comments:
+            del data['@COMMENT']
+
+    @staticmethod
+    def _process_imports(syntax, import_path):
+        for name in syntax:
+            section = syntax[name]
+            if '@IMPORT' in section:
+                paths = section['@IMPORT']
+                for path in paths:
+                    path = os.path.join(import_path, path)
+                    data = LexorSyntax._load(path)
+                    section.update(data)
+                del section['@IMPORT']
+
+    @staticmethod
     def _assert_phrases_syntax(phrases):
         for name, phrase in phrases.items():
-            if name == 'comment': continue
             if not name.startswith('P_'):
-                raise SynthaxError(f'Phrase names must start with "P_" in phrase "{name}"')
+                raise SyntaxError(f'Phrase names must start with "P_" in phrase "{name}"')
             if not 'space' in phrase:
                 phrase['space'] = True
             if not isinstance(phrase['space'], bool):
-                raise SynthaxError(f'Attribute "space" must be boolean in phrase "{name}"')
+                raise SyntaxError(f'Attribute "space" must be boolean in phrase "{name}"')
             if not 'call' in phrase:
                 phrase['call'] = False
 
@@ -41,53 +71,50 @@ class LexorSynthax:
             if 'and' in phrase: selector_phrase_count += 1
             if 'or+' in phrase: selector_phrase_count += 1
             if selector_phrase_count == 0:
-                raise SynthaxError(f'Phrase must specify one of [and, or, or+] attributes in phrase "{name}"')
+                raise SyntaxError(f'Phrase must specify one of [and, or, or+] attributes in phrase "{name}"')
             if selector_phrase_count > 1:
-                raise SynthaxError(f'Phrase can not contain more than one of [and, or, or+] attributes in phrase "{name}"')
+                raise SyntaxError(f'Phrase can not contain more than one of [and, or, or+] attributes in phrase "{name}"')
             if ('or' in phrase and not isinstance(phrase['or'], list)) or \
                     ('and' in phrase and not isinstance(phrase['and'], list)):
-                raise SynthaxError(f'Attributes "and", "or" must be arrays in phrase "{name}')
+                raise SyntaxError(f'Attributes "and", "or" must be arrays in phrase "{name}')
 
     @staticmethod
     def _assert_words_syntax(words):
         for name, word in words.items():
-            if name == 'comment': continue
             if not name.startswith('W_'):
-                raise SynthaxError(f'Word names must start with "W_" in word "{name}"')
+                raise SyntaxError(f'Word names must start with "W_" in word "{name}"')
             if not 'syllables' in word:
-                raise SynthaxError(f'Word must specify "syllables": [] in word "{name}"')
+                raise SyntaxError(f'Word must specify "syllables": [] in word "{name}"')
             if not isinstance(word['syllables'], list):
-                raise SynthaxError(f'Attribute "syllables" must be an array in word "{name}')
+                raise SyntaxError(f'Attribute "syllables" must be an array in word "{name}')
             if not 'call' in word:
                 word['call'] = False
 
     @staticmethod
     def _assert_syllables_syntax(syllables):
         for name, syllable in syllables.items():
-            if name == 'comment': continue
             if not name.startswith('S_'):
-                raise SynthaxError(f'Syllable names must start with "S_" in syllable "{name}"')
+                raise SyntaxError(f'Syllable names must start with "S_" in syllable "{name}"')
             if not 'letters' in syllable:
-                raise SynthaxError(f'Word must specify "letters": [] in syllable "{name}"')
+                raise SyntaxError(f'Word must specify "letters": [] in syllable "{name}"')
             if not isinstance(syllable['letters'], str):
-                raise SynthaxError(f'Attribute "letters" must be array in syllable "{name}')
+                raise SyntaxError(f'Attribute "letters" must be array in syllable "{name}')
             if not 'max' in syllable:
-                raise SynthaxError(f'Word must specify "max": <int> in syllable "{name}"')
+                raise SyntaxError(f'Word must specify "max": <int> in syllable "{name}"')
             if not isinstance(syllable['max'], int):
-                raise SynthaxError(f'Attribute "max" must be an integer in syllable "{name}')
+                raise SyntaxError(f'Attribute "max" must be an integer in syllable "{name}')
             if not 'inverse' in syllable:
                 syllable['inverse'] = False
             if not isinstance(syllable['inverse'], bool):
-                raise SynthaxError(f'Attribute "inverse" must be a bool in syllable "{name}')
+                raise SyntaxError(f'Attribute "inverse" must be a bool in syllable "{name}')
 
     @staticmethod
     def _assert_letters_syntax(letters):
         for name, letter in letters.items():
-            if name == 'comment': continue
             if not name.startswith('L_'):
-                raise SynthaxError(f'Letters names must start with "L_" in letters "{name}"')
+                raise SyntaxError(f'Letters names must start with "L_" in letters "{name}"')
             if not isinstance(letter, str):
-                raise SynthaxError(f'Letters" must be string in "{name}')
+                raise SyntaxError(f'Letters" must be string in "{name}')
 
     @staticmethod
     def _assert_integrity(syn):
@@ -97,7 +124,6 @@ class LexorSynthax:
         letters = syn['LETTERS']
 
         for name, phrase in phrases.items():
-            if name == 'comment': continue
             keyname = (
                 'and' if 'and' in phrase else
                 'or'  if 'or'  in phrase else
@@ -108,30 +134,31 @@ class LexorSynthax:
                     raise IntegrityError(f'{ref} is not resolvable in PHRASES or WORDS')
 
         for name, word in words.items():
-            if name == 'comment': continue
             for ref in word['syllables']:
                 if ref not in syllables.keys():
                     raise IntegrityError(f'{ref} is not resolvable in SYLLABLES')
 
         for name, syllable in syllables.items():
-            if name == 'comment': continue
             if syllable['letters'] not in letters.keys():
                 raise IntegrityError(f'{ref} is not resolvable in LETTERS')
 
     @staticmethod
     def get_syntax(syntax_file_name):
-        with open(syntax_file_name) as syntax_file:
-            data = json.load(syntax_file)
+        import_path = os.path.dirname(syntax_file_name)
+        data = LexorSyntax._load(syntax_file_name)
 
         try:
+            LexorSyntax._assert_sections(data)
             syn = data['SYNTAX']
-            LexorSynthax._assert_sections(data)
-            LexorSynthax._assert_phrases_syntax(syn['PHRASES'])
-            LexorSynthax._assert_words_syntax(syn['WORDS'])
-            LexorSynthax._assert_syllables_syntax(syn['SYLLABLES'])
-            LexorSynthax._assert_letters_syntax(syn['LETTERS'])
-            LexorSynthax._assert_integrity(syn)
-        except SynthaxError as e:
+            LexorSyntax._process_imports(syn, import_path)
+            print('done with imports')
+            LexorSyntax._process_comments(data)
+            LexorSyntax._assert_phrases_syntax(syn['PHRASES'])
+            LexorSyntax._assert_words_syntax(syn['WORDS'])
+            LexorSyntax._assert_syllables_syntax(syn['SYLLABLES'])
+            LexorSyntax._assert_letters_syntax(syn['LETTERS'])
+            LexorSyntax._assert_integrity(syn)
+        except SyntaxError as e:
             print(f'Synthax error in "{syntax_file_name}": {str(e)}')
             exit(1)
         except IntegrityError as e:
