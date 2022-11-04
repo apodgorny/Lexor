@@ -48,7 +48,7 @@ class Lexor:
             while not self.code.eof:
                 if self.code.c != '\n':
                     comment += self.code.c
-                    self.code.advance()
+                    if not self.code.advance(): break
                 else:
                     self.code.advance()
                     break
@@ -57,7 +57,7 @@ class Lexor:
             while not self.code.eof:
                 if not self.code.peek(ml_end):
                     comment += self.code.c
-                    self.code.advance()
+                    if not self.code.advance(): break
                 else:
                     self.code.advance(len(ml_end))
                     break
@@ -78,14 +78,14 @@ class Lexor:
                 if c not in self.syntax['LETTERS'][name]:
                     s += c
                     n += 1
-                    self.code.advance()
+                    if not self.code.advance(): break
                 else:
                     break
             else:
                 if c in self.syntax['LETTERS'][name]:
                     s += c
                     n += 1
-                    self.code.advance()
+                    if not self.code.advance(): break
                 else:
                     break
 
@@ -177,6 +177,32 @@ class Lexor:
             return None
         return node
 
+    def _get_sequence_phrase(self, name):
+        phrase  = self.syntax['PHRASES'][name]
+        node    = TokenNode(name, phrase['call'])
+        got_any = False
+        result  = True
+
+        for n in range(phrase['max']):
+            for name in phrase['sequence']:
+                result = False
+                if phrase['space']: self.code.skip()
+                if self._is_phrase(name) : new_node = self._get_phrase(name)
+                else                     : new_node = self._get_word(name)
+
+                if new_node:
+                    if new_node.call : node.append(new_node)
+                    else             : node.children += new_node.children
+                    result = True
+                    got_any = True
+
+            if not result:
+                break
+
+        if not got_any:
+            return None
+        return node
+
 
     @ParsePath.control
     def _get_phrase(self, name):
@@ -190,6 +216,7 @@ class Lexor:
             if   'and' in phrase : node = self._get_and_phrase(name)
             elif 'or'  in phrase : node = self._get_or_phrase(name)
             elif 'or+' in phrase : node = self._get_orplus_phrase(name)
+            elif 'sequence' in phrase : node = self._get_sequence_phrase(name)
 
             if node : self.log(f'] {name} => ({node.expression_view(True)})')
             else    : self.log(f'] {name} => NONE')
@@ -216,7 +243,10 @@ class Lexor:
 
         if executor and node:
             executor.execute(node)
-
+            print('\n========== VARIABLES ==========')
+            print(executor.dump_vars())
+            print('\n========== OUTPUT ==========')
+            print(executor.dump_output())
 
 
 

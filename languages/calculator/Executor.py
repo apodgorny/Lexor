@@ -1,6 +1,6 @@
-from library.BaseExecutor import BaseExecutor
+from lexor.BaseExecutor import BaseExecutor
 from library.Postfix import Postfix
-from library.ExpressionTree import ExpressionNode, ExpressionTree
+from library.ExpressionTree import ExpressionTree
 
 class Executor(BaseExecutor):
     def p_main(self, *args):
@@ -17,4 +17,3 @@ class Executor(BaseExecutor):
         tokens.reverse()
         tree = ExpressionTree(tokens)
         result = tree.calculate()
-        print('RESULT:', result)

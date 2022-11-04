@@ -17,18 +17,23 @@ class CodeMap:
         return self.s[self.n]
 
     def advance(self, step=1):
-        if self.n >= len(self.s) - 1:
-            print("EOF")
-            self.eof = True
-        else:
-            if self.c == '\n':
-                self.col = 0
-                self.row += 1
+        success = False
+        if not self.eof:
+            if self.n >= len(self.s) - 1:
+                self.eof = True
             else:
-                self.col  += 1
+                if self.c == '\n':
+                    self.col = 0
+                    self.row += 1
+                else:
+                    self.col  += 1
 
-            self.n += 1
-            if step > 1: self.advance(step - 1)
+                success = True
+                self.n += 1
+                if step > 1:
+                    success = self.advance(step - 1)
+
+        return success
 
     def at(self):
         max_len = 10
@@ -61,7 +66,8 @@ class CodeMap:
 
     def skip(self, chars=SPACES):
         while self.s[self.n] in chars:
-            self.advance()
+            if not self.advance():
+                break
 
     def line_at(self, n):
         i = n

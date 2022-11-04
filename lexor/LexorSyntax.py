@@ -67,16 +67,20 @@ class LexorSyntax:
                 phrase['call'] = False
 
             selector_phrase_count = 0
-            if 'or' in phrase: selector_phrase_count += 1
-            if 'and' in phrase: selector_phrase_count += 1
-            if 'or+' in phrase: selector_phrase_count += 1
+            if 'or'       in phrase: selector_phrase_count += 1
+            if 'and'      in phrase: selector_phrase_count += 1
+            if 'or+'      in phrase: selector_phrase_count += 1
+            if 'sequence' in phrase: selector_phrase_count += 1
+
             if selector_phrase_count == 0:
-                raise SyntaxError(f'Phrase must specify one of [and, or, or+] attributes in phrase "{name}"')
+                raise SyntaxError(f'Phrase must specify one of [and, or, or+, sequence] attributes in phrase "{name}"')
             if selector_phrase_count > 1:
                 raise SyntaxError(f'Phrase can not contain more than one of [and, or, or+] attributes in phrase "{name}"')
             if ('or' in phrase and not isinstance(phrase['or'], list)) or \
                     ('and' in phrase and not isinstance(phrase['and'], list)):
                 raise SyntaxError(f'Attributes "and", "or" must be arrays in phrase "{name}')
+            if 'or+' in phrase and 'max' not in phrase:
+                raise SyntaxError(f'Phrases with attribute "or+" must specify "max" in phrase "{name}"')
 
     @staticmethod
     def _assert_words_syntax(words):
@@ -127,10 +131,11 @@ class LexorSyntax:
             keyname = (
                 'and' if 'and' in phrase else
                 'or'  if 'or'  in phrase else
-                'or+'
+                'or+' if 'or+' in phrase else
+                'sequence' if 'sequence' in phrase else None
             )
             for ref in phrase[keyname]:
-                if ref not in phrases.keys() and ref not in words.keys():
+                if ref not in phrases and ref not in words:
                     raise IntegrityError(f'{ref} is not resolvable in PHRASES or WORDS')
 
         for name, word in words.items():
@@ -151,7 +156,6 @@ class LexorSyntax:
             LexorSyntax._assert_sections(data)
             syn = data['SYNTAX']
             LexorSyntax._process_imports(syn, import_path)
-            print('done with imports')
             LexorSyntax._process_comments(data)
             LexorSyntax._assert_phrases_syntax(syn['PHRASES'])
             LexorSyntax._assert_words_syntax(syn['WORDS'])

@@ -17,7 +17,8 @@ class Sqlite:
     def commit(self):
         return self.db.commit()
 
-    def insert(self, s):
+    def insert(self, s, debug=False):
+        if debug: print(s)
         try:
             self.execute(s)
             self.commit()
@@ -26,30 +27,32 @@ class Sqlite:
         except Exception:
             return None
 
-    def insert_many(self, s, data):
+    def insert_many(self, s, data, debug=False):
+        if debug: print(s)
         rowids = []
         self.cursor.executemany(s, data)
         self.commit()
         last_insert_id = self.select_value('SELECT last_insert_rowid()')
-        if len(data) == last_insert_id - self.lastid:
-            rowids = [*range(self.lastid + 1, self.cursor.lastrowid + 1)]
-        else:
-            raise Exception(f'Row ids are not consecutive {len(data)} {self.lastid} {last_insert_id}')
+        rowids = [*range(self.lastid + 1, self.cursor.lastrowid + 1)]
         self.lastid = last_insert_id
         return rowids
 
-    def select(self, s):
+    def select(self, s, debug=False):
+        if debug: print(s)
         result = self.execute(s)
         return result.fetchall()
 
-    def select_row(self, s):
+    def select_row(self, s, debug=False):
+        if debug: print(s)
         rows = self.select(s)
         return rows[0] if len(rows) > 0 else []
 
-    def select_col(self, s):
+    def select_col(self, s, debug=False):
+        if debug: print(s)
         rows = self.select(s)
         return [x[0] for x in rows]
 
-    def select_value(self, s):
+    def select_value(self, s, debug=False):
+        if debug: print(s)
         row = self.select_row(s)
         return row[0]
