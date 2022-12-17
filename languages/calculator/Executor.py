@@ -17,3 +17,4 @@ class Executor(BaseExecutor):
         tokens.reverse()
         tree = ExpressionTree(tokens)
         result = tree.calculate()
+        print('Result', result)

@@ -2,7 +2,7 @@ from os.path import exists
 from lexor import Lexor
 import importlib
 
-language = 'b3'
+language = 'calculator'
 executor = None
 
 Executor = importlib.import_module(f'languages.{language}.Executor').Executor

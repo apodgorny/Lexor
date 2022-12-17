@@ -1,6 +1,6 @@
 {
 	"CONFIG": {
-		"comment": "Config is a place where we store language settings",
+		"@COMMENT": "Config is a place where we store language settings",
 
 		"name": "Calculator",
 		"main": "P_MAIN",
@@ -9,16 +9,23 @@
 		"append_with": ")"
 	},
 	"SYNTAX": {
-		"comment": "Synthax contains PHRASES/WORDS/SYLLABLES/LETTERS",
+		"@COMMENT": "Synthax contains PHRASES/WORDS/SYLLABLES/LETTERS",
+
+		"COMMENTS": {
+			"SL_BEGIN": "#",
+			"ML_BEGIN": "===",
+			"ML_END": "==="
+		},
 
 		"PHRASES": {
-			"comment": "Phrases consist of and/or sequences of phrases/words",
+			"@COMMENT": "Phrases consist of and/or sequences of phrases/words",
 
 			"P_MAIN": {
 				"or": ["P_SCOPE", "P_SIMPLE"]
 			},
 			"P_SIMPLE": {
-				"or+": ["P_OPERAND_PHRASE", "P_AND_MORE"]
+				"or+": ["P_OPERAND_PHRASE", "P_AND_MORE"],
+				"max": 1000
 			},
 			"P_AND_MORE": {
 				"and": ["P_OPERATOR", "P_SIMPLE"]
@@ -37,7 +44,7 @@
 			}
 		},
 		"WORDS": {
-			"comment": "Words are collected by lexor, consist of syllables",
+			"@COMMENT": "Words are collected by lexor, consist of syllables",
 
 			"W_OPERATOR":{
 				"syllables": ["S_OPERATOR"],
@@ -61,7 +68,7 @@
 			}
 		},
 		"SYLLABLES": {
-			"comment": "Syllables are sequences of letters within max length",
+			"@COMMENT": "Syllables are sequences of letters within max length",
 
 			"S_DOT": {
 				"letters": "L_DOT",
@@ -85,7 +92,7 @@
 			}
 		},
 		"LETTERS": {
-			"comment": "Letters are sets of characters",
+			"@COMMENT": "Letters are sets of characters",
 
 			"L_DIGIT": "0123456789",
 			"L_OPERATOR": "-+/*",
